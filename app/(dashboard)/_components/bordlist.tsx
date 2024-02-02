@@ -1,6 +1,9 @@
 'use client'
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api";
+import { useOrganization } from "@clerk/nextjs";
 
 
 interface BordListProps{
@@ -12,6 +15,17 @@ interface BordListProps{
 };
 
 export default function BordList({ orgId, query }: BordListProps) {
+    const { organization } = useOrganization()
+    const create = useMutation(api.boards.create)
+
+    const onClick = () => {
+        if(!organization) return;
+        create({
+            title: "Untitled",
+            orgId: organization.id
+        })
+    };
+
     const data = [];
 
     if(!data?.length && query.search){
@@ -53,12 +67,11 @@ export default function BordList({ orgId, query }: BordListProps) {
                     Start by creating a board for your organization
                 </p>
                 <div className="mt-6">
-                    <Button size='lg'>Create Board</Button>
+                    <Button onClick={onClick} size='lg'>Create Board</Button>
                 </div>
             </div>
         )
     }
-
 
   return (
     <div>
