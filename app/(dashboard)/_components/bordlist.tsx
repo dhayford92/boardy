@@ -1,9 +1,18 @@
 'use client'
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api";
 import { useOrganization } from "@clerk/nextjs";
+import { useApiMutation } from "@/hooks/use-api-mutation";
+import { toast } from "sonner"
+import { useQuery } from "convex/react";
+import BoardCard from "./board-card";
+import NewBoardButton from "./new-board-button";
+import { Skeleton } from "@/components/ui/skeleton"
+
+
+
 
 
 interface BordListProps{
@@ -16,17 +25,39 @@ interface BordListProps{
 
 export default function BordList({ orgId, query }: BordListProps) {
     const { organization } = useOrganization()
-    const create = useMutation(api.boards.create)
+    const {mutate, pending} = useApiMutation(api.board.create)
 
     const onClick = () => {
         if(!organization) return;
-        create({
+
+        mutate({
             title: "Untitled",
             orgId: organization.id
+        }).then((result)=>{
+            toast.success("Board created");
+        }).catch((error)=>{
+            toast.error("Failed to create board")
         })
     };
 
-    const data = [];
+    const data = useQuery(api.boards.get, { orgId });
+
+    if(data === undefined){
+        return (
+            <div>
+                <h2 className="text-2xl">
+                    {query.favorites ? "Favorite Boards": "Team Board"}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 mt-8 pb-10">
+                    <NewBoardButton orgId={orgId} disabled/>
+                    <Skeleton className="aspect-[100/127] border rounded-lg overflow-hidden" />
+                    <Skeleton className="aspect-[100/127] border rounded-lg overflow-hidden" />
+                    <Skeleton className="aspect-[100/127] border rounded-lg overflow-hidden" />
+                    <Skeleton className="aspect-[100/127] border rounded-lg overflow-hidden" />
+                </div>
+            </div>
+        )
+    }
 
     if(!data?.length && query.search){
         return (
@@ -67,7 +98,7 @@ export default function BordList({ orgId, query }: BordListProps) {
                     Start by creating a board for your organization
                 </p>
                 <div className="mt-6">
-                    <Button onClick={onClick} size='lg'>Create Board</Button>
+                    <Button disabled={pending} onClick={onClick} size='lg'>Create Board</Button>
                 </div>
             </div>
         )
@@ -75,7 +106,25 @@ export default function BordList({ orgId, query }: BordListProps) {
 
   return (
     <div>
-        
+        <h2 className="text-2xl">
+            {query.favorites ? "Favorite Boards": "Team Board"}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 mt-8 pb-10">
+            <NewBoardButton orgId={orgId}/>
+            {data.map((board)=>(
+                <BoardCard 
+                    key={board._id}
+                    id={board._id}
+                    title={board.title}
+                    imageUrl={board.imageUrl}
+                    authorId={board.authorId}
+                    authorName={board.authorName}
+                    createdAt={board._creationTime}
+                    orgId={board.orgId}
+                    isFavorite={false}
+                />
+            ))}
+        </div>
     </div>
   )
 }
