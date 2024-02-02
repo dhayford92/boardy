@@ -3,11 +3,18 @@
 import React from 'react'
 import EmptyOrg from './_components/emptyorg'
 import { useOrganization } from '@clerk/nextjs'
+import BordList from './_components/bordlist';
 
 
+interface DashboardPageProps {
+  searchParams: {
+    search?: string;
+    favorite?: string;
+  };
+};
 
 
-export default function DashboardPage() {
+export default function DashboardPage({ searchParams }: DashboardPageProps) {
   const { organization } = useOrganization()
 
   return (
@@ -15,7 +22,10 @@ export default function DashboardPage() {
         {!organization ? (
             <EmptyOrg/>
           ): (
-            <h1>Dash</h1>
+            <BordList
+              orgId={organization.id}
+              query={searchParams}
+            />
           )
         }
         
