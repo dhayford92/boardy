@@ -5,8 +5,9 @@ import Overlay from "./overlat"
 import { formatDistanceToNow } from "date-fns"
 import { useAuth } from "@clerk/nextjs"
 import { cn } from "@/lib/utils"
-import { Star } from "lucide-react"
+import { Star, MoreHorizontal } from "lucide-react"
 import { useState } from "react"
+import { Action } from "@/components/actions"
 
 interface BoardCardProps {
     id: string,
@@ -47,6 +48,11 @@ function BoardCard({
             <div className="relative flex-1 bg-amber-50"> 
                 <Image src={imageUrl} fill alt={title} className="absolute object-fit" />
                 <Overlay/>
+                <Action id={id} title={title} side="right">
+                    <button title="actions" type="button" className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-2 outline-none">
+                        <MoreHorizontal className="h-5 w-5 text-white opacity-75 hover:opacity-100 transition-opacity" />
+                    </button>
+                </Action>
             </div>
             <div className='relative bg-white p-3'>
                 <p className="text-[13px] truncate max-w-[calc(100%-20px)]">
