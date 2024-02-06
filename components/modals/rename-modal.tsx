@@ -1,6 +1,6 @@
 import { useRenameModel } from "@/store/use-rename-model"
 import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogClose, DialogHeader, DialogDescription } from "../ui/dialog"
-import { useEffect, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useApiMutation } from "@/hooks/use-api-mutation";
@@ -13,13 +13,13 @@ export const RenameModal = () => {
     const { mutate, pending } = useApiMutation(api.board.update);
     const [ title, setTitle ] = useState(initialValues.title);
 
-
-
     useEffect(()=> {
         setTitle(initialValues.title);
     }, [initialValues.title]);
 
-    const onSumbit = () => {
+    const onSumbit: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+    
         mutate({ id: initialValues.id, title })
         .then(()=> {
             toast.success('Board title updated');
@@ -51,8 +51,7 @@ export const RenameModal = () => {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button 
-                            disabled={
+                        <Button disabled={
                                 (title === initialValues.title) || (title.length === 0) || pending
                             }
                             type='submit'>

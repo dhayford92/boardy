@@ -2,12 +2,17 @@
 import Link from "next/link"
 import Image from "next/image"
 import Overlay from "./overlat"
+import React from "react"
 import { formatDistanceToNow } from "date-fns"
 import { useAuth } from "@clerk/nextjs"
 import { cn } from "@/lib/utils"
 import { Star, MoreHorizontal } from "lucide-react"
 import { useState } from "react"
 import { Action } from "@/components/actions"
+import { useApiMutation } from "@/hooks/use-api-mutation"
+import { api } from "@/convex/_generated/api"
+import { toast } from "sonner"
+
 
 interface BoardCardProps {
     id: string,
@@ -32,14 +37,23 @@ function BoardCard({
 }: BoardCardProps) {
     const { userId } = useAuth();
     const [disabled, setDisable] = useState(false)
+    const { mutate: favorite, pending: pendingFavorite } = useApiMutation(api.board.favorite)
+    const { mutate: unfavorite, pending: peindingUnfavorite } = useApiMutation(api.board.unfavorite)
 
     const authorLabel = userId === authorId ? "You" : authorName;
     const createdAtlabel = formatDistanceToNow(createdAt, {
         addSuffix: true
     });
 
-    const onClick = ()=> {
-
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>)=>{
+        event.stopPropagation();
+        event.preventDefault();
+        
+        if(isFavorite){
+            unfavorite(id).catch(()=>toast.error("Fail to unfavorite"))
+        }else(
+            favorite({id, orgId}).catch(()=>toast.error("Fail to favorite"))
+        )
     }
 
   return (
@@ -64,12 +78,11 @@ function BoardCard({
                 <button 
                     title="Add To Favorite"
                     type='button'
-                    disabled={disabled} 
-                    onClick={onClick}  
+                    disabled={pendingFavorite || peindingUnfavorite} 
+                    onClick={handleClick}  
                     className={cn("absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity hover:text-blue-600",
                         disabled && "cursor-not-allowed"
-                    )}
-                >
+                    )}>
                     <Star className={cn("h-4 w-4",
                         isFavorite && "fill-blue-600 text-blue-600"
                     )} />

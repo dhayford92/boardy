@@ -7,13 +7,20 @@ export const get = query({
     },
 
    async handler(ctx, args) {
-        const identity = ctx.auth.getUserIdentity();
+        const identity = await ctx.auth.getUserIdentity();
 
         if(!identity) throw new Error("unauthorized")
 
         const boards = await ctx.db.query("boards")
-        .withIndex("by_org", (q)=> q.eq("orgId", args.orgId))
+        .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
         .order("desc").collect();
+
+        const boardsWithFavoriteRelation = boards.map((board) => {
+            return ctx.db
+                .query("userFavorites")
+                .withIndex("by_user_board", (q) => q.eq("userId", identity.subject) 
+                .eq("boardId", board._id))
+        });
 
         return boards;
     },
