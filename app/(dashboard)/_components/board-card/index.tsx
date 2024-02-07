@@ -50,7 +50,7 @@ function BoardCard({
         event.preventDefault();
         
         if(isFavorite){
-            unfavorite(id).catch(()=>toast.error("Fail to unfavorite"))
+            unfavorite({id}).catch(()=>toast.error("Fail to unfavorite"))
         }else(
             favorite({id, orgId}).catch(()=>toast.error("Fail to favorite"))
         )

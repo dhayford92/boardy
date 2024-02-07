@@ -25,7 +25,7 @@ export default function SearchInput() {
             { skipEmptyString: true, skipNull: true }
         );
         
-        // router.push(url)
+        // router.prefetch(url)
     }, [debouncedSearch, router])
 
   return (

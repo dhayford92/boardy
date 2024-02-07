@@ -1,16 +1,17 @@
 "use client"
-import { Button } from '@/components/ui/button'
 import { api } from '@/convex/_generated/api'
 import { useApiMutation } from '@/hooks/use-api-mutation'
 import { cn } from '@/lib/utils'
 import { useOrganization } from '@clerk/nextjs'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 
 function NewBoardButton({orgId, disabled}: { orgId: string, disabled?: boolean}) {
     const { organization } = useOrganization()
     const {mutate, pending} = useApiMutation(api.board.create)
+    const router = useRouter()
 
   return (
     <button
@@ -22,8 +23,9 @@ function NewBoardButton({orgId, disabled}: { orgId: string, disabled?: boolean})
             mutate({
                 title: "Untitled",
                 orgId: organization.id
-            }).then((result)=>{
+            }).then((id)=>{
                 toast.success("Board created");
+                router.push(`board/${id}`);
             }).catch((error)=>{
                 toast.error("Failed to create board")
             })

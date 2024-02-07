@@ -10,6 +10,7 @@ import { useQuery } from "convex/react";
 import BoardCard from "./board-card";
 import NewBoardButton from "./new-board-button";
 import { Skeleton } from "@/components/ui/skeleton"
+import { useRouter } from 'next/navigation'
 
 
 
@@ -26,6 +27,7 @@ interface BordListProps{
 export default function BordList({ orgId, query }: BordListProps) {
     const { organization } = useOrganization()
     const {mutate, pending} = useApiMutation(api.board.create)
+    const router = useRouter()
 
     const onClick = () => {
         if(!organization) return;
@@ -33,14 +35,15 @@ export default function BordList({ orgId, query }: BordListProps) {
         mutate({
             title: "Untitled",
             orgId: organization.id
-        }).then((result)=>{
+        }).then((id)=>{
             toast.success("Board created");
+            router.push(`board/${id}`);
         }).catch((error)=>{
             toast.error("Failed to create board")
         })
     };
 
-    const data = useQuery(api.boards.get, { orgId });
+    const data = useQuery(api.boards.get, { orgId, ...query });
 
     if(data === undefined){
         return (
@@ -121,7 +124,7 @@ export default function BordList({ orgId, query }: BordListProps) {
                     authorName={board.authorName}
                     createdAt={board._creationTime}
                     orgId={board.orgId}
-                    isFavorite={false}
+                    isFavorite={board.isFavorite}
                 />
             ))}
         </div>
