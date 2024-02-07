@@ -1,7 +1,14 @@
 import React from 'react'
 import Canvas from './_components/convas'
 
-export default function BoardIdPage() {
+
+interface BoardIdPageProps {
+    params: {
+        boardId: string;
+    }
+}
+
+export default function BoardIdPage({params}: BoardIdPageProps) {
   return (
     <Canvas/>
   )
