@@ -6,10 +6,13 @@ import Participants from './paticipants'
 import Toolbar from './toolbar'
 
 
-function Canvas() {
+function Canvas({boardId}:{boardId: string}) {
+
+ 
+
   return (
     <main className='h-full w-full relative bg-neutral-100 touch-none'>
-        <Info/>
+        <Info boardId={boardId}/>
         <Participants/>
         <Toolbar/>
     </main>
