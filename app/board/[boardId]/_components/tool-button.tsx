@@ -15,7 +15,7 @@ interface ToolButtonProps {
 
 function ToolButton({
     label,
-    icon,
+    icon: Icon,
     onClick,
     isActive,
     isDisabled}: ToolButtonProps) {
@@ -27,7 +27,7 @@ function ToolButton({
             size="icon"
             variant={isActive ? "boardActive": "board"}
             >
-                
+                <Icon/>
         </Button>
     </Hint>
   )
